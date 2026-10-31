@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basket De Vinci 5x5 — Tableau de bord</title>
+<meta name="theme-color" content="#0E1626">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1626; --panel:#16213A; --panel-2:#1C2945; --line:#2A3654; --line-soft:#22304D;
+  --ink:#F4F1EA; --ink-2:#C3C9D6; --ink-3:#9AA3B5;
+  --ldv1:#F2C14E; --ldv2:#FF8A3D; --ldv3:#4FB3FF; --green:#7BD389; --red:#FF7A6B;
+  --radius:14px;
+  --head:'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --body:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:64px}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1100px; margin:0 auto; padding:0 16px}
+
+/* Header */
+.hero{position:relative; overflow:hidden; padding:32px 0 20px}
+.hero svg.ball{position:absolute; right:-140px; top:-140px; width:380px; height:380px; opacity:.08; pointer-events:none}
+.eyebrow{display:flex; align-items:center; gap:10px; font-family:var(--head); font-weight:700; font-size:15px; letter-spacing:2.5px; text-transform:uppercase; color:var(--green)}
+.eyebrow::before{content:""; width:28px; height:3px; background:currentColor}
+.hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap}
+h1{margin:10px 0 6px; font-family:var(--head); font-weight:800; font-size:clamp(44px, 9vw, 76px); line-height:.92; text-transform:uppercase; letter-spacing:-.5px}
+.hero p{margin:0; color:var(--ink-2); max-width:640px}
+.stamp{display:flex; flex-direction:column; align-items:flex-end; gap:2px; padding:10px 14px; border-radius:12px; background:var(--panel); box-shadow:inset 0 0 0 1.5px var(--green); flex-shrink:0}
+.stamp span{font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-3)}
+.stamp b{font-family:var(--head); font-size:24px; line-height:1}
+
+/* Nav */
+nav.jump{position:sticky; top:0; z-index:10; background:rgba(14,22,38,.94); backdrop-filter:blur(8px); border-bottom:1px solid var(--line-soft)}
+nav.jump .wrap{display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-top:10px; padding-bottom:10px}
+nav.jump .wrap::-webkit-scrollbar{display:none}
+nav.jump a{flex-shrink:0; text-decoration:none; font-size:14px; font-weight:600; color:var(--ink-2); padding:9px 14px; border-radius:999px; background:var(--panel)}
+nav.jump a:hover{color:var(--ink); background:var(--panel-2)}
+
+section{padding:28px 0 8px}
+h2{margin:0 0 4px; font-family:var(--head); font-weight:800; font-size:32px; text-transform:uppercase; letter-spacing:.3px}
+.lead{margin:0 0 16px; color:var(--ink-3); font-size:15px}
+
+/* Cards */
+.grid3{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px}
+.card{background:var(--panel); border-radius:var(--radius); padding:18px}
+.next{border-top:5px solid var(--c); display:flex; flex-direction:column; gap:8px}
+.next .team{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.next .team b{font-family:var(--head); font-size:30px; line-height:1; color:var(--c)}
+.countdown{font-size:13px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; padding:4px 10px; border-radius:999px; background:var(--panel-2); color:var(--ink)}
+.next .when{font-family:var(--head); font-weight:700; font-size:24px; text-transform:uppercase; line-height:1.05}
+.next .vs{font-size:18px; font-weight:600}
+.muted{color:var(--ink-3); font-size:14px}
+.venue{display:inline-flex; align-items:center; gap:6px; color:var(--ink-2); font-size:15px; text-decoration:none}
+a.venue:hover{color:var(--ink); text-decoration:underline}
+.venue svg{flex-shrink:0}
+.warn{font-size:14px; font-weight:600; color:var(--c, var(--ldv2))}
+.pill{display:inline-block; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; white-space:nowrap}
+.pill.home{background:var(--c); color:#0E1626}
+.pill.away{box-shadow:inset 0 0 0 1.5px #4A5675; color:var(--ink-2)}
+
+/* Deadlines */
+.tasks{display:flex; flex-direction:column; gap:10px}
+.task{display:grid; grid-template-columns:72px minmax(0,1fr); gap:14px; align-items:start; background:var(--panel); border-radius:var(--radius); padding:14px 16px; border-left:0}
+.task .d{display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--bg); border-radius:10px; padding:8px 0; font-family:var(--head); text-transform:uppercase; line-height:1}
+.task .d small{font-size:13px; font-weight:700; letter-spacing:1.5px; color:var(--ink-3)}
+.task .d strong{font-size:32px; margin:2px 0}
+.task .d em{font-style:normal; font-size:14px; font-weight:700; letter-spacing:1px; color:var(--green)}
+.task h3{margin:0 0 4px; font-size:17px; line-height:1.3}
+.task p{margin:0 0 8px; color:var(--ink-2); font-size:15px}
+.task.urgent .d em{color:var(--red)}
+.task.urgent h3::after{content:"Urgent"; margin-left:8px; vertical-align:2px; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#0E1626; background:var(--red); padding:2px 8px; border-radius:999px}
+.task.done{opacity:.45}
+.task.done h3{text-decoration:line-through}
+.links-inline{display:flex; gap:8px; flex-wrap:wrap}
+
+/* Buttons */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 16px; border-radius:999px; border:0; font:600 14px/1 var(--body); text-decoration:none; cursor:pointer; background:var(--green); color:#0E1626}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent; color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.btn.sm{min-height:36px; padding:8px 12px; font-size:13px}
+
+/* Calendar */
+.toolbar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{min-height:40px; padding:8px 14px; border-radius:999px; border:0; background:var(--panel); color:var(--ink-2); font:600 14px var(--body); cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink); color:#0E1626}
+.chip .dot{display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--c); margin-right:6px}
+.toggle{display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ink-2); cursor:pointer}
+.toggle input{width:18px; height:18px; accent-color:var(--green)}
+.month{margin:18px 0 8px; font-family:var(--head); font-weight:700; font-size:18px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-3)}
+.match{display:grid; grid-template-columns:64px minmax(0,1fr) auto; gap:14px; align-items:center; background:var(--panel); border-radius:var(--radius); padding:14px 16px; margin-bottom:8px; border-left:5px solid var(--c)}
+.match.past{opacity:.45}
+.match .date{display:flex; flex-direction:column; align-items:center; font-family:var(--head); text-transform:uppercase; line-height:1}
+.match .date small{font-size:13px; font-weight:700; letter-spacing:1.5px; color:var(--ink-3)}
+.match .date strong{font-size:34px}
+.match .info{display:flex; flex-direction:column; gap:4px; min-width:0}
+.match .top{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.tag{font-family:var(--head); font-weight:800; font-size:17px; color:var(--c); letter-spacing:.5px}
+.match .opp{font-weight:600; font-size:17px}
+.match .side{display:flex; flex-direction:column; align-items:flex-end; gap:6px}
+.match .time{font-family:var(--head); font-weight:800; font-size:28px; line-height:1}
+.match .report{font-size:13px; color:var(--ink-3)}
+.legend{margin:10px 0 0; font-size:14px; color:var(--ink-3)}
+
+/* Rosters */
+.roster{border-top:5px solid var(--c); padding:0; overflow:hidden}
+.roster header{padding:16px 18px 12px; display:flex; flex-direction:column; gap:6px}
+.roster header .row{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+.roster header .row b{font-family:var(--head); font-size:34px; line-height:1; color:var(--c)}
+.roster .coach{background:var(--panel-2); border-radius:10px; padding:10px 12px; font-size:15px}
+.roster .coach b{font-weight:600}
+.roster .coach small{display:block; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-3)}
+.roster ol{list-style:none; margin:0; padding:0 18px 8px}
+.roster li{display:flex; align-items:baseline; gap:10px; padding:10px 0; border-bottom:1px solid var(--line-soft)}
+.roster li:last-child{border-bottom:0}
+.roster li .n{width:22px; font-family:var(--head); font-weight:700; color:var(--c)}
+.roster li .nm{flex:1; min-width:0}
+.roster li .nm b{text-transform:uppercase; font-weight:600}
+.roster li .lic{font-size:14px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.roster footer{padding:0 18px 16px}
+
+/* Rules */
+.rule h3{margin:0 0 8px; font-family:var(--head); font-weight:700; font-size:22px; text-transform:uppercase}
+.rule ul{margin:0; padding-left:18px; color:var(--ink-2)}
+.rule li{margin-bottom:6px}
+.rule li b{color:var(--ink)}
+
+/* Links */
+.linkgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px}
+.linkcard{display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--panel); border-radius:var(--radius); text-decoration:none; min-height:64px}
+.linkcard:hover{background:var(--panel-2)}
+.linkcard .ic{width:40px; height:40px; border-radius:10px; background:var(--panel-2); display:flex; align-items:center; justify-content:center; color:var(--green); flex-shrink:0}
+.linkcard strong{display:block; font-size:15px}
+.linkcard span{display:block; font-size:13px; color:var(--ink-3)}
+
+footer.site{margin-top:36px; padding:22px 0 34px; border-top:1px solid var(--line-soft); color:var(--ink-3); font-size:13px}
+
+.toast{position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:var(--ink); color:#0E1626; font-weight:600; font-size:14px; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:20}
+.toast.show{opacity:1}
+
+@media (max-width:560px){
+  .match{grid-template-columns:52px minmax(0,1fr); gap:12px}
+  .match .side{grid-column:2; flex-direction:row; align-items:center; justify-content:flex-start; flex-wrap:wrap; gap:10px}
+  .match .time{font-size:24px}
+  .task{grid-template-columns:60px minmax(0,1fr)}
+  .stamp{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <svg class="ball" viewBox="0 0 100 100" fill="none" stroke="#7BD389" stroke-width="2.2" aria-hidden="true"><circle cx="50" cy="50" r="46"/><path d="M4 50h92M50 4v92"/><path d="M18 18c14 14 14 50 0 64M82 18c-14 14-14 50 0 64"/></svg>
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Saison 2026 – 2027</div>
+        <h1>Basket De Vinci 5X5</h1>
+        <p>Championnat IDF FFSU · Matchs, échéances et effectifs des équipes LDV1, LDV2 et LDV3.</p>
+      </div>
+      <div class="stamp"><span>Mis à jour le</span><b id="updated"></b></div>
+    </div>
+  </div>
+</div>
+
+<nav class="jump" aria-label="Sections">
+  <div class="wrap">
+    <a href="#prochains">Prochains matchs</a>
+    <a href="#echeances">À faire</a>
+    <a href="#calendrier">Calendrier</a>
+    <a href="#effectifs">Effectifs</a>
+    <a href="#regles">Règles</a>
+    <a href="#liens">Liens utiles</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section id="prochains">
+    <h2>Prochains matchs</h2>
+    <p class="lead">Le prochain match de chaque équipe, calculé automatiquement à partir de la date du jour.</p>
+    <div class="grid3" id="nextCards"></div>
+  </section>
+
+  <section id="echeances">
+    <h2>À faire</h2>
+    <p class="lead">Échéances tirées du mail FFSU du 31/10/2026. Les échéances passées s'estompent automatiquement.</p>
+    <div class="tasks" id="tasks"></div>
+  </section>
+
+  <section id="calendrier">
+    <h2>Calendrier</h2>
+    <p class="lead">Touchez un lieu pour l'ouvrir dans Google Maps.</p>
+    <div class="toolbar">
+      <div class="chips" id="teamChips" role="group" aria-label="Filtrer par équipe"></div>
+      <label class="toggle"><input type="checkbox" id="showPast"> Afficher les matchs passés</label>
+    </div>
+    <div id="matchList"></div>
+    <p class="legend"><span class="pill home" style="--c:var(--green)">Domicile</span> De Vinci reçoit et fournit les arbitres, même sur terrain neutre.</p>
+    <div class="links-inline" style="margin-top:14px">
+      <button class="btn" id="icsBtn" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18M12 14v4M10 16h4"/></svg>
+        <span id="icsLabel">Ajouter à mon agenda</span>
+      </button>
+      <a class="btn ghost" href="https://gestion.mysportu.com/sportif/synthese/rencontres?saison=2027&amp;structure_id=70" target="_blank" rel="noopener">Calendrier officiel MySportU</a>
+    </div>
+  </section>
+
+  <section id="effectifs">
+    <h2>Effectifs</h2>
+    <p class="lead">Joueurs ayant leur licence FFSU, par équipe. Le bouton « Copier » met la liste dans le presse-papiers, pratique pour remplir la feuille de match.</p>
+    <div class="grid3" id="rosters"></div>
+  </section>
+
+  <section id="regles">
+    <h2>Règles à retenir</h2>
+    <p class="lead">L'essentiel du mail FFSU.</p>
+    <div class="grid3">
+      <div class="card rule">
+        <h3>Feuille de match</h3>
+        <ul>
+          <li>À <b>pré-remplir sur MySportU avant le mardi 14h</b> précédant le premier match de championnat.</li>
+          <li>Au moins <b>5 noms</b>, sinon <b>forfait</b> et aucun arbitre convoqué.</li>
+        </ul>
+      </div>
+      <div class="card rule">
+        <h3>Reports de match</h3>
+        <ul>
+          <li><b>Uniquement via le formulaire</b> en ligne.</li>
+          <li>Demande à envoyer <b>avant le lundi 17h</b> précédant le match.</li>
+          <li>Mails, SMS et messages vocaux <b>ne sont pas traités</b>.</li>
+        </ul>
+      </div>
+      <div class="card rule">
+        <h3>Poules modifiées</h3>
+        <ul>
+          <li>Équipes ajoutées ou remplacées : <b>BBME1 Groupe 1, BBME2 Groupe 3, BBME3 Groupe 3</b>.</li>
+          <li>Vérifier régulièrement le calendrier officiel : il peut encore changer.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="liens">
+    <h2>Liens utiles</h2>
+    <p class="lead">Tous les liens du mail FFSU, au même endroit.</p>
+    <div class="linkgrid" id="links"></div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">Basket De Vinci 5X5 · Données mises à jour le <span id="updated2"></span> d'après MySportU et le mail FFSU du 31/10/2026. En cas de doute, le calendrier officiel MySportU fait foi.</div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   DONNÉES — c'est ici qu'il faut modifier quand la FFSU change quelque chose.
+   Dates au format "AAAA-MM-JJ", heures au format "HH:MM".
+   ===================================================================== */
+const UPDATED = "31/10/2026";
+
+const TEAMS = {
+  LDV1: { color: "var(--ldv1)", niveau: "BBME1", coach: ["Thierry", "Thalien", "575856"] },
+  LDV2: { color: "var(--ldv2)", niveau: "BBME2", coach: ["Florian", "Eude", "575006"] },
+  LDV3: { color: "var(--ldv3)", niveau: "BBME3", coach: ["Florian", "Eude", "575006"] }
+};
+
+const JPR = "Gymnase Jean-Pierre Rives · PULV";
+const MATCHES = [
+  // LDV1
+  { team: "LDV1", date: "2026-11-12", time: "13:00", opp: "ILEPS Cergy", venue: JPR, home: true },
+  { team: "LDV1", date: "2026-11-19", time: "14:00", opp: "ECE Paris", venue: "Gymnase Coubertin n°3", home: false },
+  { team: "LDV1", date: "2026-12-10", time: "13:15", opp: "ENPC (École des Ponts)", venue: JPR, home: true, note: "Lieu à confirmer" },
+  { team: "LDV1", date: "2026-12-17", time: "14:00", opp: "ENPC (École des Ponts)", venue: "", home: false, note: "Lieu à confirmer" },
+  { team: "LDV1", date: "2027-01-21", time: "14:00", opp: "ILEPS Cergy", venue: "Maradas · La Grande Halle", home: false },
+  { team: "LDV1", date: "2027-01-28", time: "13:00", opp: "ECE Paris", venue: JPR, home: true },
+  // LDV2
+  { team: "LDV2", date: "2026-11-19", time: "13:00", opp: "American Business College (ABC)", venue: JPR, home: true },
+  { team: "LDV2", date: "2026-11-26", time: "13:00", opp: "IESEG Paris", venue: JPR, home: true },
+  { team: "LDV2", date: "2026-12-03", time: "16:00", opp: "Sciences Po Saint-Germain-en-Laye", venue: "Gymnase Sciences Po · Saint-Germain-en-Laye", home: false },
+  { team: "LDV2", date: "2026-12-10", time: "18:00", opp: "American Business College (ABC)", venue: "Sarrailh · Dôme 3", home: false },
+  { team: "LDV2", date: "2026-12-17", time: "13:00", opp: "Sciences Po Saint-Germain-en-Laye", venue: JPR, home: true },
+  { team: "LDV2", date: "2027-01-28", time: "15:00", opp: "IESEG Paris", venue: "Gymnase Alexandre Lippmann", home: true, note: "Attention : ce n'est pas notre gymnase habituel" },
+  // LDV3
+  { team: "LDV3", date: "2026-11-12", time: "14:00", opp: "ENSEA Cergy", venue: "Maradas · La Grande Halle", home: false },
+  { team: "LDV3", date: "2026-11-19", time: "14:00", opp: "ILEPS Cergy", venue: "Maradas · La Grande Halle", home: false },
+  { team: "LDV3", date: "2026-11-26", time: "14:00", opp: "IESEG Paris", venue: "Gymnase Suzanne Lenglen", home: true },
+  { team: "LDV3", date: "2026-12-03", time: "14:00", opp: "ISC Paris", venue: "Gymnase Suzanne Lenglen", home: false },
+  { team: "LDV3", date: "2026-12-10", time: "16:00", opp: "ESSCA Paris", venue: "Gymnase Coubertin n°3", home: true },
+  { team: "LDV3", date: "2026-12-17", time: "14:00", opp: "ENS Ulm", venue: "Gymnase Coubertin n°3", home: true },
+  { team: "LDV3", date: "2027-01-28", time: "15:30", opp: "ESSEC Business School", venue: "Gymnase Îlot Saint-Germain", home: true }
+];
+
+// [Prénom, Nom, Équipe, N° de licence]
+const PLAYERS = [
+  ["Ewen","Bertomeu","LDV1","1120465"],["Noa","Chabassier","LDV1","1072319"],["Matthias","Cornuejols","LDV1","1110962"],
+  ["Maxence","Epry","LDV1","1111008"],["Reda","Guettache","LDV1","1061037"],["Thomas","Guyot","LDV1","1115211"],
+  ["Lowen","Martin","LDV1","1117137"],["Matheo","Negoce","LDV1","951236"],["Solal","Pieri","LDV1","985924"],
+  ["Waïl","Sariane","LDV1","1120795"],["Yanis","Talai","LDV1","1111002"],
+  ["Théo","Dupont-Saurin","LDV2","1120897"],["Timothée","Dutreuil","LDV2","1121505"],["Mohamed","El Tayara","LDV2","1110793"],
+  ["Lucas","Hamaimi","LDV2","1122761"],["Matthieu","Legrand","LDV2","1060486"],["Steeven","Lepembe","LDV2","1121736"],
+  ["Karim","Madi","LDV2","1115279"],["Macéo","Mohamed Le Ray","LDV2","1091951"],["Tom","Ringot","LDV2","969533"],
+  ["Maxime","Coulpier","LDV3","1115643"],["Maxime","Huard","LDV3","1065689"],["Carlo","Madi","LDV3","1110757"],
+  ["Anis","Messaoudi","LDV3","1121016"],["Charlie","Pellerin","LDV3","1111506"],["Gabriel","Rousselet","LDV3","1085912"],
+  ["Léo","Roux","LDV3","1115657"],["Jean","Salmeron","LDV3","1111128"]
+];
+
+const LINKS = {
+  calendrier: "https://gestion.mysportu.com/sportif/synthese/rencontres?saison=2027&structure_id=70",
+  fdm: "https://gestion.mysportu.com/feuille-de-match#/",
+  tuto: "https://youtu.be/xgsXIuHjHDo",
+  report: "https://framaforms.org/formulaire-de-report-2627-1789985806",
+  teams1: "https://teams.microsoft.com/meet/3295785178591098?p=le3bHN95puxVpjMQbU",
+  teams2: "https://teams.microsoft.com/meet/3429513089668520?p=sNoZaeV12smKMCHITb",
+  organigrammes: "https://sport-u-iledefrance.com/basket-organigrammes-2026-2027/",
+  basket: "https://sport-u-iledefrance.com/sports-co-basket/",
+  selection: "https://floe2.github.io/LDVDraft2026/"
+};
+
+// Échéances fixes (les échéances « feuille de match » sont calculées plus bas)
+const FIXED_TASKS = [
+  { at: "2026-11-02T13:00", title: "Réunion MySportU : gestion des matchs", text: "Formation en visio (Teams), lundi 2 novembre à 13h.", links: [["Rejoindre la réunion", LINKS.teams1]] },
+  { at: "2026-11-04T10:00", title: "Réunion MySportU : gestion des matchs", text: "Deuxième session en visio (Teams), mercredi 4 novembre à 10h.", links: [["Rejoindre la réunion", LINKS.teams2]] }
+];
+
+/* =====================================================================
+   AFFICHAGE — normalement rien à modifier en dessous.
+   ===================================================================== */
+const DAYS = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+const DAYS_LONG = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const MONTHS = ["Janv", "Févr", "Mars", "Avr", "Mai", "Juin", "Juil", "Août", "Sept", "Oct", "Nov", "Déc"];
+const MONTHS_LONG = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const PIN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const toDate = (d, t) => { const [y, mo, da] = d.split("-").map(Number); const [h, mi] = (t || "00:00").split(":").map(Number); return new Date(y, mo - 1, da, h, mi); };
+const fmtTime = (dt) => dt.getHours() + "h" + String(dt.getMinutes()).padStart(2, "0");
+const fmtDayLong = (dt) => DAYS_LONG[dt.getDay()] + " " + dt.getDate() + " " + MONTHS_LONG[dt.getMonth()];
+const startOfDay = (dt) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+const daysBetween = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / 86400000);
+const mapsUrl = (v) => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(v.replace(" · ", " ") + " Île-de-France");
+const now = new Date();
+
+MATCHES.forEach((m) => { m.dt = toDate(m.date, m.time); m.end = new Date(m.dt.getTime() + 90 * 60000); });
+MATCHES.sort((a, b) => a.dt - b.dt);
+
+// Lundi 17h précédant un match (limite de demande de report)
+function reportDeadline(dt) {
+  const d = startOfDay(dt);
+  let back = (d.getDay() + 6) % 7; if (back === 0) back = 7;
+  d.setDate(d.getDate() - back); d.setHours(17, 0, 0, 0); return d;
+}
+// Mardi 14h précédant un match (limite de pré-saisie de la feuille de match)
+function fdmDeadline(dt) {
+  const d = startOfDay(dt);
+  let back = (d.getDay() + 5) % 7; if (back === 0) back = 7;
+  d.setDate(d.getDate() - back); d.setHours(14, 0, 0, 0); return d;
+}
+function countdownLabel(dt) {
+  const n = daysBetween(now, dt);
+  if (n < 0) return "Passé";
+  if (n === 0) return "Aujourd'hui";
+  if (n === 1) return "Demain";
+  return "Dans " + n + " jours";
+}
+function venueHtml(m) {
+  if (!m.venue) return '<span class="venue">' + PIN + "Lieu à confirmer</span>";
+  return '<a class="venue" href="' + mapsUrl(m.venue) + '" target="_blank" rel="noopener">' + PIN + esc(m.venue) + "</a>";
+}
+
+document.getElementById("updated").textContent = UPDATED;
+document.getElementById("updated2").textContent = UPDATED;
+
+/* Prochains matchs */
+(function renderNext() {
+  const box = document.getElementById("nextCards");
+  box.innerHTML = Object.keys(TEAMS).map((t) => {
+    const m = MATCHES.find((x) => x.team === t && x.end > now);
+    const c = TEAMS[t].color;
+    if (!m) return '<div class="card next" style="--c:' + c + '"><div class="team"><b>' + t + '</b></div><p class="muted">Plus de match prévu pour l\'instant.</p></div>';
+    const rd = reportDeadline(m.dt);
+    return '<div class="card next" style="--c:' + c + '">' +
+      '<div class="team"><b>' + t + '</b><span class="countdown">' + countdownLabel(m.dt) + "</span></div>" +
+      '<div class="when">' + fmtDayLong(m.dt) + " · " + fmtTime(m.dt) + "</div>" +
+      '<div class="vs">vs ' + esc(m.opp) + ' <span class="pill ' + (m.home ? "home" : "away") + '">' + (m.home ? "Domicile" : "Extérieur") + "</span></div>" +
+      venueHtml(m) +
+      (m.note ? '<div class="warn">' + esc(m.note) + "</div>" : "") +
+      '<div class="muted">Report possible jusqu\'au ' + fmtDayLong(rd) + " à 17h</div>" +
+      "</div>";
+  }).join("");
+})();
+
+/* À faire */
+(function renderTasks() {
+  const tasks = FIXED_TASKS.map((t) => ({ ...t, dt: new Date(t.at) }));
+  Object.keys(TEAMS).forEach((t) => {
+    const first = MATCHES.find((m) => m.team === t);
+    if (!first) return;
+    tasks.push({
+      dt: fdmDeadline(first.dt), team: t,
+      title: "Feuille de match " + t + " : au moins 5 noms",
+      text: "Pré-remplir la feuille sur MySportU avant mardi 14h, pour le premier match du " + fmtDayLong(first.dt) + " contre " + first.opp + ". Sinon : forfait.",
+      links: [["Feuille de match", LINKS.fdm], ["Tutoriel vidéo", LINKS.tuto]]
+    });
+  });
+  // Regroupe les feuilles de match qui tombent le même jour
+  const merged = [];
+  tasks.forEach((t) => {
+    const same = merged.find((x) => x.team && t.team && x.dt.getTime() === t.dt.getTime());
+    if (same) {
+      same.teamsList.push(t.team);
+      same.title = "Feuilles de match " + same.teamsList.join(" et ") + " : au moins 5 noms";
+      same.text = "Pré-remplir les feuilles sur MySportU avant mardi 14h, pour les premiers matchs du " + fmtDayLong(MATCHES.find((m) => m.team === t.team).dt) + ". Sinon : forfait.";
+    } else merged.push({ ...t, teamsList: t.team ? [t.team] : [] });
+  });
+  merged.sort((a, b) => a.dt - b.dt);
+  document.getElementById("tasks").innerHTML = merged.map((t) => {
+    const n = daysBetween(now, t.dt);
+    const cls = t.dt < now ? "done" : n <= 3 ? "urgent" : "";
+    return '<div class="task ' + cls + '">' +
+      '<div class="d"><small>' + DAYS[t.dt.getDay()] + "</small><strong>" + t.dt.getDate() + "</strong><em>" + MONTHS[t.dt.getMonth()] + "</em></div>" +
+      "<div><h3>" + esc(t.title) + "</h3><p>" + esc(t.text) + ' <span class="muted">· ' + fmtTime(t.dt) + "</span></p>" +
+      '<div class="links-inline">' + (t.links || []).map((l) => '<a class="btn ghost sm" href="' + l[1] + '" target="_blank" rel="noopener">' + esc(l[0]) + "</a>").join("") + "</div></div>" +
+      "</div>";
+  }).join("");
+})();
+
+/* Calendrier */
+let teamFilter = "ALL";
+function renderChips() {
+  const opts = [["ALL", "Toutes", null]].concat(Object.keys(TEAMS).map((t) => [t, t, TEAMS[t].color]));
+  document.getElementById("teamChips").innerHTML = opts.map(([v, l, c]) =>
+    '<button type="button" class="chip" data-v="' + v + '" aria-pressed="' + (teamFilter === v) + '"' + (c ? ' style="--c:' + c + '"' : "") + ">" + (c ? '<span class="dot"></span>' : "") + l + "</button>").join("");
+  document.querySelectorAll("#teamChips .chip").forEach((b) => b.addEventListener("click", () => { teamFilter = b.dataset.v; saveFilter(); renderChips(); renderMatches(); }));
+  document.getElementById("icsLabel").textContent = teamFilter === "ALL" ? "Ajouter tous les matchs à mon agenda" : "Ajouter les matchs " + teamFilter + " à mon agenda";
+}
+function filteredMatches(includePast) {
+  return MATCHES.filter((m) => (teamFilter === "ALL" || m.team === teamFilter) && (includePast || m.end > now));
+}
+function renderMatches() {
+  const showPast = document.getElementById("showPast").checked;
+  const list = filteredMatches(showPast);
+  const box = document.getElementById("matchList");
+  if (!list.length) { box.innerHTML = '<p class="muted">Aucun match à venir pour ce filtre.</p>'; return; }
+  let html = "", lastMonth = "";
+  list.forEach((m) => {
+    const mk = MONTHS_LONG[m.dt.getMonth()] + " " + m.dt.getFullYear();
+    if (mk !== lastMonth) { html += '<div class="month">' + mk + "</div>"; lastMonth = mk; }
+    const c = TEAMS[m.team].color;
+    html += '<article class="match' + (m.end <= now ? " past" : "") + '" style="--c:' + c + '">' +
+      '<div class="date"><small>' + DAYS[m.dt.getDay()] + "</small><strong>" + String(m.dt.getDate()).padStart(2, "0") + "</strong></div>" +
+      '<div class="info"><div class="top"><span class="tag">' + m.team + '</span><span class="opp">vs ' + esc(m.opp) + "</span></div>" +
+      venueHtml(m) +
+      (m.note ? '<div class="warn">' + esc(m.note) + "</div>" : "") +
+      (m.end > now ? '<div class="report">Report : demande avant le ' + fmtDayLong(reportDeadline(m.dt)) + " à 17h</div>" : "") +
+      "</div>" +
+      '<div class="side"><span class="time">' + fmtTime(m.dt) + '</span><span class="pill ' + (m.home ? "home" : "away") + '">' + (m.home ? "Domicile" : "Extérieur") + "</span></div>" +
+      "</article>";
+  });
+  box.innerHTML = html;
+}
+function saveFilter() { try { localStorage.setItem("ldv_team", teamFilter); } catch (e) {} }
+try { const s = localStorage.getItem("ldv_team"); if (s && (s === "ALL" || TEAMS[s])) teamFilter = s; } catch (e) {}
+document.getElementById("showPast").addEventListener("change", renderMatches);
+renderChips(); renderMatches();
+
+/* Export agenda (.ics) */
+document.getElementById("icsBtn").addEventListener("click", () => {
+  const pad = (n) => String(n).padStart(2, "0");
+  const f = (d) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
+  const icsEsc = (s) => String(s).replace(/\\/g, "\\\\").replace(/[,;]/g, (m) => "\\" + m).replace(/\n/g, "\\n");
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Basket De Vinci//FR", "CALSCALE:GREGORIAN",
+    "BEGIN:VTIMEZONE", "TZID:Europe/Paris",
+    "BEGIN:STANDARD", "DTSTART:19701025T030000", "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU", "TZOFFSETFROM:+0200", "TZOFFSETTO:+0100", "END:STANDARD",
+    "BEGIN:DAYLIGHT", "DTSTART:19700329T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU", "TZOFFSETFROM:+0100", "TZOFFSETTO:+0200", "END:DAYLIGHT",
+    "END:VTIMEZONE"];
+  filteredMatches(false).forEach((m) => {
+    lines.push("BEGIN:VEVENT",
+      "UID:" + m.team + "-" + m.date + "-" + m.time.replace(":", "") + "@basket-devinci",
+      "DTSTAMP:" + stamp,
+      "DTSTART;TZID=Europe/Paris:" + f(m.dt),
+      "DTEND;TZID=Europe/Paris:" + f(m.end),
+      "SUMMARY:" + icsEsc("Basket " + m.team + " vs " + m.opp + (m.home ? " (domicile)" : " (extérieur)")),
+      "LOCATION:" + icsEsc(m.venue || "Lieu à confirmer"),
+      "DESCRIPTION:" + icsEsc((m.note ? m.note + "\n" : "") + "Championnat IDF FFSU basket 5x5. Vérifier sur MySportU : " + LINKS.calendrier),
+      "END:VEVENT");
+  });
+  lines.push("END:VCALENDAR");
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "basket-devinci-" + (teamFilter === "ALL" ? "toutes-equipes" : teamFilter.toLowerCase()) + ".ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast("Fichier agenda téléchargé : ouvrez-le pour ajouter les matchs");
+});
+
+/* Effectifs */
+(function renderRosters() {
+  document.getElementById("rosters").innerHTML = Object.keys(TEAMS).map((t) => {
+    const T = TEAMS[t];
+    const list = PLAYERS.filter((p) => p[2] === t).sort((a, b) => a[1].localeCompare(b[1], "fr") || a[0].localeCompare(b[0], "fr"));
+    return '<div class="card roster" style="--c:' + T.color + '">' +
+      '<header><div class="row"><b>' + t + '</b><span class="muted">' + list.length + " joueurs · " + T.niveau + "</span></div>" +
+      '<div class="coach"><small>Coach</small>' + esc(T.coach[0]) + " <b>" + esc(T.coach[1].toUpperCase()) + '</b> <span class="muted">· licence ' + esc(T.coach[2]) + "</span></div></header>" +
+      "<ol>" + list.map((p, i) => '<li><span class="n">' + String(i + 1).padStart(2, "0") + '</span><span class="nm">' + esc(p[0]) + " <b>" + esc(p[1]) + '</b></span><span class="lic">' + esc(p[3]) + "</span></li>").join("") + "</ol>" +
+      '<footer><button type="button" class="btn ghost sm" data-copy="' + t + '">Copier la liste ' + t + "</button></footer>" +
+      "</div>";
+  }).join("");
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const t = b.dataset.copy, T = TEAMS[t];
+    const list = PLAYERS.filter((p) => p[2] === t).sort((a, b) => a[1].localeCompare(b[1], "fr"));
+    const text = t + "\nCoach : " + T.coach[0] + " " + T.coach[1].toUpperCase() + " – " + T.coach[2] + "\n" +
+      list.map((p) => p[1].toUpperCase() + " " + p[0] + " – " + p[3]).join("\n");
+    try { await navigator.clipboard.writeText(text); toast("Liste " + t + " copiée"); }
+    catch (e) { toast("Copie impossible sur cet appareil"); }
+  }));
+})();
+
+/* Liens */
+(function renderLinks() {
+  const ic = {
+    cal: '<path d="M8 3v4M16 3v4"/><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 11h18"/>',
+    doc: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+    play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/>',
+    form: '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+    tree: '<rect x="9" y="3" width="6" height="5" rx="1"/><rect x="3" y="16" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    team: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2a5 5 0 0 1 5.5 4.8"/>',
+    video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>'
+  };
+  const items = [
+    ["team", "Appli de sélection", "LDV Draft 2026 · appel, évaluations, équipes", LINKS.selection],
+    ["cal", "Calendrier officiel", "MySportU · toutes les rencontres", LINKS.calendrier],
+    ["doc", "Feuilles de match", "MySportU · à pré-remplir avant mardi 14h", LINKS.fdm],
+    ["play", "Tutoriel feuille de match", "Vidéo YouTube", LINKS.tuto],
+    ["form", "Formulaire de report", "Avant le lundi 17h précédant le match", LINKS.report],
+    ["video", "Réunion Teams · lun 2/11 13h", "Gestion des matchs sur MySportU", LINKS.teams1],
+    ["video", "Réunion Teams · mer 4/11 10h", "Gestion des matchs sur MySportU", LINKS.teams2],
+    ["tree", "Organigrammes 2026-2027", "Sport U Île-de-France", LINKS.organigrammes],
+    ["info", "Page Basketball", "Toutes les infos du basket universitaire", LINKS.basket]
+  ];
+  document.getElementById("links").innerHTML = items.map(([i, t, s, u]) =>
+    '<a class="linkcard" href="' + u + '" target="_blank" rel="noopener"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ic[i] + "</svg></span><span><strong>" + esc(t) + "</strong><span>" + esc(s) + "</span></span></a>").join("");
+})();
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+}
+</script>
+</body>
+</html>
